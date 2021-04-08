@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+    tools { 
+        maven 'maven-3.6.0' 
+        jdk 'jdk1.8.0_111' 
+    }
+    stages {
+        stage('clone') {
+            steps {
+                git credentialsId: 'alm_build', url: 'https://bitbucket.materna.de/scm/maternaalm/java_examples.git'
+            }
+        }
+        
+        stage ('Build') {
+            steps {
+                dir('maven') {
+                    configFileProvider([configFile(fileId: 'my-maven-settings-dot-xml', variable: 'MAVEN_SETTINGS_XML')]) {
+                        sh 'mvn -s $MAVEN_SETTINGS_XML clean compile'
+                    }
+                }
+            }
+        }
+    }
+}
